@@ -238,7 +238,8 @@ async def run(req: Request, x_token: str = Header(None)):
 def getlog(jid: str, tail: int = 60, x_token: str = Header(None)):
     auth(x_token)
     if jid.startswith('install_'): path = f'{W}/{jid}.log'
-    else: path = JOBS[jid]['log']
+    elif jid in JOBS: path = JOBS[jid]['log']
+    else: raise HTTPException(404, f'unknown job {jid}')   # e.g. a job from an earlier session
     lines = open(path, errors='replace').read().splitlines()
     head = f"[rc={JOBS[jid]['proc'].poll()} secs={round(time.time() - JOBS[jid]['start'])}]\n" if jid in JOBS else ''
     return head + '\n'.join(lines[-tail:])
