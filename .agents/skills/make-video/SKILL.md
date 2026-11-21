@@ -23,7 +23,7 @@ Treat the chosen master prompt as if the user had pasted it, with its §0 filled
 - If the user's message contains `ENDPOINT : https://….trycloudflare.com` and `TOKEN : …`, write them to `.env` as `KAGGLE_URL=` / `KAGGLE_TOKEN=` (replace old values) and verify with `python tools/node.py info`.
 - If missing or `info` fails (links change every Kaggle session): tell the user in one line — "run `kaggle/render_node.py` in one Kaggle cell (GPU T4 x2, Internet ON) and paste the ENDPOINT + TOKEN lines" — and include it in the Step 3 checkpoint message. Writing the script/voices can proceed meanwhile; rendering waits for the link.
 
-## Step 1 — parse the brief → `<film>/story/brief.yaml`
+## Step 1 — parse the brief → `videos/<slug>/story/brief.yaml`
 | field | if the user didn't say |
 |---|---|
 | format | **long** (16:9 1920×1080) unless the request says short/shorts/reel/vertical → **shorts** (9:16 1080×1920) |
@@ -34,7 +34,7 @@ Treat the chosen master prompt as if the user had pasted it, with its §0 filled
 | captions | **off** (user preference) unless asked |
 | title mode | `single` (bilingual only if two languages requested) |
 | parody of real IP | original caricatures only + fan-made disclaimer (`AGENTS.md` rule 5) |
-Film slug: lowercase-kebab of the topic (`vid_gen/<slug>/`, same sub-layout as `AGENTS.md` §2).
+Film slug: lowercase-kebab of the topic (`vid_gen/videos/<slug>/`, same sub-layout as `AGENTS.md` §2).
 
 ## Step 2 — format rules
 - **Long (16:9):** TEMPLATES §2 story structure, intro title (§13) + outro/end card 10–20 s with YouTube end-screen space, chapters for the description.
@@ -45,7 +45,7 @@ Film slug: lowercase-kebab of the topic (`vid_gen/<slug>/`, same sub-layout as `
 Send: logline · 6–10 beat outline · cast (names + one-line looks + voice presets) · track/format/duration/language chosen · and, only if Step 0.5 found no live link, ask for the **Kaggle ENDPOINT + TOKEN**. Continue immediately when they reply; apply any requested changes without re-asking.
 
 ## Step 4 — build (no more questions unless blocked)
-script → voices (casting reel once if the user cares about voices; else default presets) → timeline → characters/sets → shots → build-only check → QA stills (3 per shot) → fix → 10-second sample with audio (share it) → final render → foley/SFX/music → mix (−15 LUFS) → `out/<slug>_final.mp4` (+ `_silent.mp4`, stems) → YouTube package (title/description/tags/chapters or Shorts caption + hashtags).
+script → voices (casting reel once if the user cares about voices; else default presets) → timeline → characters/sets → shots → build-only check → QA stills (3 per shot) → fix → 10-second sample with audio (share it) → final render → foley/SFX/music → mix (−15 LUFS) → `videos/<slug>/out/<slug>_final.mp4` (+ `_silent.mp4`, stems) → YouTube package (title/description/tags/chapters or Shorts caption + hashtags).
 
 ## Step 5 — report
 Final file paths, duration, what was skipped or not checked (ponytail rule), and an honest note on any known flaw.

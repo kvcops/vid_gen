@@ -10,4 +10,4 @@
 - Any "make a video …" request → follow the make-video skill (imported above; also `/make-video <topic> [shorts|long] [duration]`). Build a new film from `prompts/MASTER_PROMPT_animation_pipeline.md` (3D) or `prompts/MASTER_PROMPT_2D_animation.md` (2D), filling `prompts/TEMPLATES.md`.
 - Long Kaggle jobs: start them with `tools/node.py run`, then wait with a background poll (`until ... grep ALLDONE ...`), not foreground sleeps.
 - Look at QA images with the Read tool before declaring a shot done.
-- Use the scratchpad for temporary files; keep film outputs inside `<film>/out/`.
+- Use the scratchpad for temporary files; keep film outputs inside `videos/<film>/out/`.

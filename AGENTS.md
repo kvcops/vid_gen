@@ -19,7 +19,7 @@ Every agent (Claude Code, Codex, OpenCode, others) must load and follow the **po
 The user will NOT paste prompts. They type things like *"make a video about a lazy lion king, shorts, 50 s"*, *"long funny 3D video on Devara 2 part 2 in Telugu"*, *"2D explainer on black holes, 3 min"*.
 On ANY request to make/generate/create/animate a video, short, reel, episode, film or cartoon:
 1. Load ponytail (§0) → this file → the **make-video** skill (`.agents/skills/make-video/SKILL.md`, same in `.claude/skills/make-video/`).
-2. Follow it: parse the brief with its defaults (format long 16:9 / shorts 9:16, duration, 2D/3D, language — English unless named), auto-load the right master prompt + `prompts/TEMPLATES.md`, create `vid_gen/<slug>/`, do the single checkpoint (outline + Kaggle ENDPOINT/TOKEN), then build to the final mp4 without further questions.
+2. Follow it: parse the brief with its defaults (format long 16:9 / shorts 9:16, duration, 2D/3D, language — English unless named), auto-load the right master prompt + `prompts/TEMPLATES.md`, create `vid_gen/videos/<slug>/`, do the single checkpoint (outline + Kaggle ENDPOINT/TOKEN), then build to the final mp4 without further questions.
 
 ## 1. What this repo is
 A studio that turns a story idea into a **finished animated film** (YouTube-ready, 16:9 1080p24, optional 9:16 Shorts) using **only code**:
@@ -37,10 +37,12 @@ vid_gen/
     MASTER_PROMPT_2D_animation.md               # 2D track spec
     TEMPLATES.md                                # shared templates: bibles, character cards, vector design spec, shots, emotions, voices, camera, staging/timing (§12), titles & fonts (§13), SFX, music, YouTube
   tools/node.py  tools/sheet.py                 # Kaggle client · QA contact sheets (shared by all films)
-  <film>/                                       # one folder per film, same sub-layout:
-    story/ blender/ (or anim2d/) tools/ audio/ assets/ media/ out/ prompts/ README.md
+  videos/                                       # every film we make (git-ignored, stays local)
+    <film>/                                     # one folder per film, same sub-layout:
+      story/ blender/ (or anim2d/) tools/ audio/ assets/ media/ out/ prompts/ README.md
+    devara/                                     # film #1 (3D) — reuse its code for new 3D films
 ```
-**New film = new folder** `vid_gen/<film_slug>/`. Never put film-specific files at the root. Film folders are local only (git-ignored). If an earlier film folder exists locally, reuse its code (copy, then adapt).
+**New film = new folder** `vid_gen/videos/<film_slug>/`. Never put film-specific files at the root. `videos/` is local only (git-ignored). Reuse code from earlier films in `videos/` (e.g. `videos/devara/blender/lib/`; copy, then adapt).
 
 ## 3. Golden rules (non-negotiable)
 1. **Picture = Blender (3D or 2.5D) or the pure-Python 2D renderer.** No Remotion / three.js / Node / npm / puppeteer / web renderers. No AI text-to-video for story shots (identity drifts). AI video (Veo etc.) only for optional intro/outro/establishing plates the user supplies.
@@ -99,12 +101,12 @@ vid_gen/
 ## 8. Commands cheat-sheet
 ```bash
 python tools/node.py info
-python tools/node.py push <film> audio/dialogue.wav            # upload a film folder
+python tools/node.py push videos/<film> audio/dialogue.wav           # upload a film folder
 python tools/node.py run qa0 0 "python3 blender/qa_batch.py 0"   # jobs run inside the uploaded film folder
 python tools/node.py log qa0 40
-python tools/node.py get out/<film>_silent.mp4 <film>/out/<film>_silent.mp4
-blender -b --factory-startup --python <film>/blender/run_shot.py -- s05 still none   # local build-only check
-python <film>/tools/final_mix.py                                  # final audio + picture assembly
+python tools/node.py get out/<film>_silent.mp4 videos/<film>/out/<film>_silent.mp4
+blender -b --factory-startup --python videos/<film>/blender/run_shot.py -- s05 still none   # local build-only check
+python videos/<film>/tools/final_mix.py                                 # final audio + picture assembly
 ```
 
 ## 9. How to talk to the user

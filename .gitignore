@@ -19,5 +19,5 @@ __pycache__/
 venv/
 Thumbs.db
 desktop.ini
-# film folders are personal / local only — the repo holds the reusable studio
-devara/
+# every generated film lives in videos/ — local only, the repo holds the reusable studio
+videos/

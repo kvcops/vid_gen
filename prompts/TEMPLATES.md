@@ -1,6 +1,6 @@
 # TEMPLATES.md — fill-in templates for every film (3D and 2D)
 
-Agents: copy the block, fill every `<...>`, save under `<film>/story/` or `<film>/prompts/`. Do not invent new formats.
+Agents: copy the block, fill every `<...>`, save under `<film>/story/` or `<film>/prompts/` (`<film>` = `videos/<film_slug>/`). Do not invent new formats.
 
 ---
 

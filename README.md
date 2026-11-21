@@ -15,6 +15,6 @@ TOKEN    : xxxxxxxx
 ```
 (format, duration, 2D/3D and language are optional — e.g. `long 3D video, 6 min, Telugu: Devara 2 part 2`)
 
-**3. Approve the short outline** the agent shows → the video lands in `<film>/out/<film>_final.mp4`.
+**3. Approve the short outline** the agent shows → the video lands in `videos/<film>/out/<film>_final.mp4`.
 
 The link changes every Kaggle session — re-run the cell and paste the new lines. Agent rules: `AGENTS.md`
