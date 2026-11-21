@@ -57,7 +57,8 @@ vid_gen/
 10. **Staging/timing/focus/orientation rules** (`prompts/TEMPLATES.md` §12) and **title/intro/outro rules** (§13) are mandatory for every shot and every film.
 11. **No image-generation models** for characters, sets or animation — vector or 3D geometry only. Raster only for user-made thumbnails.
 12. **Language-agnostic:** never hard-code a language. Dialogue, titles, cards, disclaimers, fonts and voices come from `bible.yaml` (`languages`, `text.<lang>`, font registry TEMPLATES §13.2). Films may be English, Telugu, Hindi… or several versions.
-13. **Ask the user only for:** Kaggle ENDPOINT + TOKEN, HF token / "Agree" on gated models, voice pick from casting reels, creative approval of the script. Decide everything else yourself.
+13. **Engaging, never static (TEMPLATES §14):** many locations (mostly open/exterior), fast visual cadence, re-hooks every 30–45 s, characters that move. A film in one closed set is a failure. **Voices are acted (§15):** emotion, pace, pauses and emphasis per line, varied line to line.
+14. **Ask the user only for:** Kaggle ENDPOINT + TOKEN, HF token / "Agree" on gated models, voice pick from casting reels, creative approval of the script. Decide everything else yourself.
 
 ## 4. Kaggle node workflow
 1. User runs `kaggle/render_node.py` in one Kaggle cell (Accelerator **GPU T4 x2**, Internet ON) and pastes `ENDPOINT` + `TOKEN` — usually together with the video request — → write them to `.env` as `KAGGLE_URL` / `KAGGLE_TOKEN`, verify with `tools/node.py info`. The link changes every Kaggle session; if `info` fails, ask for fresh lines.

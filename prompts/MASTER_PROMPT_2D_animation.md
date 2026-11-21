@@ -8,6 +8,8 @@
 > front/¾/profile/back body angles, walk cycles with staggered joints, damped-spring hair/cloth, camera + transitions) and
 > **Rigby2D** (open-source 2D skeletal animator: auto-rig layered SVG, IK, mesh bending, physics, lip-sync, video render).
 
+> **Engagement + voice acting:** follow `TEMPLATES.md` §14 (many locations, mostly exterior, fast cadence, re-hooks — never one closed set) and §15 (per-line emotion/pace/pauses, per-model TTS controls). Run the §14.5 self-check before rendering.
+
 > **Step 0:** load the ponytail skill first (`.agents/skills/ponytail/SKILL.md`, level full) and follow `AGENTS.md` §0 — minimal code and short replies, but never skip QA or requested features.
 
 ## 0. FILL THIS

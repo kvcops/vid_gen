@@ -6,6 +6,8 @@
 > The user runs ONE Kaggle cell and pastes back `ENDPOINT` + `TOKEN`. Everything else is the agent's job.
 > Model choices below were researched (Nov 2026: leaderboards, licences, VRAM, reviews). Re-check each model card's licence at use time.
 
+> **Engagement + voice acting:** follow `TEMPLATES.md` §14 (many locations, mostly exterior, fast cadence, re-hooks — never one closed set) and §15 (per-line emotion/pace/pauses, per-model TTS controls). Run the §14.5 self-check before rendering.
+
 > **Step 0:** load the ponytail skill first (`.agents/skills/ponytail/SKILL.md`, level full) and follow `AGENTS.md` §0 — minimal code and short replies, but never skip QA or requested features.
 
 ---

@@ -47,7 +47,7 @@ disclaimer: "<fan-made fictional parody, entertainment only>"   # when parodying
 | Climax | 60–85 % | action set piece + hero entry |
 | Twist 2 / cliffhanger | 85–95 % | sets up Part 2 |
 | Button / outro | 95–100 % | callback joke + end card |
-Rules: a laugh or reveal every 20–30 s · every scene ends on a turn · callbacks to earlier jokes · max 2 lines per speech, ≤ 18 words each · stage directions in `action` beats, not in dialogue.
+Rules: **move to a new location every 30–60 s (§14)** · a laugh or reveal every 20–30 s · every scene ends on a turn · callbacks to earlier jokes · max 2 lines per speech, ≤ 18 words each · stage directions in `action` beats, not in dialogue.
 
 ## 3. Character card — `<film>/story/characters/<ID>.yaml`
 ```yaml
@@ -118,7 +118,7 @@ shots:
 - **mystery_twin:** "Very deep, smooth, slow, menacing whisper-like male voice, calm confident villainy."
 - **narrator:** "Rich cinematic trailer narrator, slow dramatic pauses, deep and resonant."
 - **child:** "Energetic young child, high pitch, curious, fast and giggly."
-Line-level control: emotion tag + paralinguistic tag + pace; put pauses as "..." and commas; one emotion per line.
+Line-level control: full per-line direction + per-model controls in §15.
 
 ## 7. Camera presets
 | size | frame height | lens (3D) | 2D zoom | use |
@@ -263,3 +263,73 @@ Rules: title-safe 90 % (Shorts 80 %); main title ≥ 8 % of frame height; contra
 - **Outro / end card:** 10–20 s (YouTube end screens need 5–20 s at the very end): callback gag or calm landscape plate, "to be continued" line, end title, small disclaimer — all text from `text.<lang>`; **reserve empty areas for YouTube end-screen elements** (video tiles left/right, subscribe circle).
 - Sound: whoosh-in → hit on reveal → riser into the first scene; outro = music resolve + soft ambience tail.
 - Optional AI-video plates (user-made with Veo etc.): prompt them with an empty text area; the code composites the title in the right language.
+
+## 14. Engagement, variety & pacing (YouTube retention) — mandatory, checked before any rendering
+A YouTube film lives or dies on retention. **Never build a film in one room, one location or one camera setup.** Talking heads in a closed set = rejected.
+### 14.1 Location & look budget (hard minimums)
+| | long (5–7 min) | long (2–4 min) | Shorts (≤ 60 s) |
+|---|---|---|---|
+| distinct locations | **≥ 8** | ≥ 5 | ≥ 3 backdrops |
+| exterior / open-air share | ≥ 50 % of runtime | ≥ 50 % | ≥ 1 exterior |
+| moving set (vehicle, boat, chase, crowd march, flight) | ≥ 1 | ≥ 1 | optional |
+| spectacle set piece (storm, fight, festival, crash, giant reveal) | ≥ 2 | ≥ 1 | 1 (the hook or payoff) |
+| lighting looks (time of day / weather) | ≥ 3 | ≥ 2 | ≥ 1 change |
+| longest continuous stay in one location | ≤ 60 s | ≤ 45 s | ≤ 20 s |
+| one location's total share | ≤ 25 % | ≤ 30 % | ≤ 50 % |
+Location ideas to mix (procedural; redress kits cheaply with new colours/props/light): village street, busy market, beach, open sea / boat deck, cliff top, forest path, temple / festival ground, river bank, rooftop at night, highway / vehicle chase, island, hill-top viewpoint, police station, home courtyard, cave, storm sea. Interiors only as short contrast beats.
+### 14.2 Visual change cadence
+- Average shot length: dialogue 2.5–4 s · action 0.8–2 s · Shorts 1–2 s. Something **new on screen every ≤ 5 s** (cut, camera move, entrance, prop reveal, FX, location change).
+- No static camera > 4 s (except a held comic reaction). Each dialogue scene has ≥ 1 blocking change (characters move, stand, cross, turn).
+- Every new location opens with a 1.5–3 s establishing shot (wide, moving camera, life in it).
+- Transitions do work: match cuts, whip pans, travel montage (3–5 quick shots), map/route wipe, flashback or imagination cutaway gags, split screen for phone calls / parallel action.
+### 14.3 Retention curve (beat timing)
+- **0–5 s** (Shorts 0–1.5 s): the strongest visual + a line that opens a question. No logo or slow fade first.
+- By 15 s: the promise / goal is clear (what we are waiting to see).
+- **Re-hook every 30–45 s**: new location, reveal, stakes jump, a new character's entrance or a big gag.
+- Midpoint: biggest escalation or twist. Climax: the largest set piece in the most open, dynamic location.
+- No exposition block > 10 s; no dead air > 1.5 s except deliberate comic beats; trim the first and last 0.5 s of most dialogue shots.
+- Ending: payoff + callback + cliffhanger / button; end card 10–20 s.
+### 14.4 Characters that carry a video
+- Each main character: a visual hook (silhouette, colour, prop), a clear want, a catchphrase or verbal tic, a distinct energy/walk, a running gag.
+- Long films: 3–6 speaking characters + background extras so places feel alive. Entrances are events (music hit, camera move, reaction shots).
+- Characters **move through space** (walk-and-talk, chase, ride, climb, fall) instead of standing and talking. Cut to reactions often — faces sell comedy.
+- Background life in every exterior: crowds, animals, birds, waves, vehicles, wind in trees, smoke, flags.
+### 14.5 Self-check (run on the outline and on `audio/timeline.json`; fix failures before rendering)
+Count distinct locations, exterior share, longest single-location stretch, one location's share, average shot length, longest static shot, gaps between re-hooks. Print a table; any failure → rewrite the outline/shots. Show the location list + scene table to the user at the checkpoint.
+**Reject these patterns:** whole film in one room · back-and-forth talking heads · same camera angle 3+ times in a row · walking with nothing happening · scenes that end without a turn · long title/logo before the hook.
+
+## 15. Voice performance (TTS acting: tone, pace, emotion) — mandatory
+A flat, same-speed read kills a video even with great pictures. Direct every line like an actor.
+### 15.1 Per-line direction (screenplay fields)
+```yaml
+- speaker: VARA
+  text: "You think the fish... is just a fish?"
+  emotion: sly            # one main emotion (§5)
+  intensity: 2            # 1 subtle · 2 clear · 3 big
+  pace: slow              # slow | normal | fast | very_fast  (targets below)
+  volume: low             # whisper | low | normal | loud | shout
+  pause_before: 0.4       # seconds — comic/dramatic beats
+  pause_after: 0.2
+  emphasis: [fish]        # words to hit
+  nonverbal: [chuckle]    # laugh, chuckle, sigh, gasp, breath, scoff, sob, gulp
+  subtext: "he knows the secret and enjoys teasing"
+```
+### 15.2 Pace, pauses & variety
+- English speed targets: normal 150–170 words/min · excited/comic 180–210 · scared rambling 210–240 · dramatic/menacing 110–130 · narrator 130–150. Other languages: measure syllables/s on a reference take and scale the same way.
+- **Vary pace and energy between consecutive lines** — never 3 lines in a row with the same emotion + pace. Arguments speed up; reveals slow down.
+- Pauses: before a punchline 0.4–0.8 s · dramatic reveal 0.8–1.5 s · interruption = cut the previous line with "—" and overlap 0.1–0.3 s · quick banter 0.05–0.2 s gaps.
+- Text tricks: punctuation drives prosody ("..." hesitation, "—" cut-off, "!" energy, "?" lift); short sentences; spell out numbers; respell hard names phonetically; native script for each language (never transliterate through another language).
+### 15.3 Controls per model (use what the chosen model supports; check its model card for exact names)
+| model | emotion / tone | pace / energy |
+|---|---|---|
+| **ElevenLabs v3/v4** (API) | inline audio tags: `[excited]` `[whispers]` `[shouts]` `[sarcastic]` `[nervous]` `[sad]` `[laughs]` `[sighs]` `[gasps]` | stability 0.30–0.45 for acting, 0.55–0.7 for narrator; speed 0.9–1.15; CAPS on one emphasized word; `language_code` per language |
+| **Maya1** | voice description (age, gender, timbre, accent, energy) + inline emotion tags such as `<laugh>` `<sigh>` `<whisper>` `<angry>` `<gasp>` `<cry>` | describe pace in the voice description ("fast excited delivery"); split long lines |
+| **Chatterbox Turbo** | paralinguistic tags `[laugh]` `[chuckle]` `[sigh]` `[gasp]` `[cough]`; the reference clip carries the tone | `exaggeration` 0.3 calm … 0.8+ dramatic; lower `cfg_weight` (~0.3) = slower, more deliberate; 0.5 default |
+| **Step-Audio-EditX** | generate (or clone), then **edit** emotion (happy/sad/angry/fear/surprise…) and style (whisper, serious, childlike…) — 1–3 edit passes for a stronger effect; insert paralinguistics | speed edit (faster/slower) on the same take |
+| **ZONOS3** | emotion vector (happiness, sadness, anger, fear, surprise…) + reference voice | `speaking_rate`; more pitch variation = more expressive |
+| any | — | post: rubberband tempo 0.9–1.15 without pitch change (never outside 0.85–1.35) |
+### 15.4 Casting & consistency
+- Spread voices across pitch, age and energy so every character is recognisable with eyes closed. Lock one reference clip / seed / voice id per character for the whole film (and later parts).
+- Key lines (hook, punchlines, reveals): generate 2–3 takes and pick the best.
+### 15.5 Voice QA (before the timeline is final)
+Whisper transcript vs script (no missing/extra words) · per-line pitch variance and words/min (flag monotone or wrong-pace lines and regenerate) · loudness matched per character · emotions match the picture (§5) · lines land on the beat timings of §12.5.

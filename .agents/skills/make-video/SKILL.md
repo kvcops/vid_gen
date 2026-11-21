@@ -40,9 +40,11 @@ Film slug: lowercase-kebab of the topic (`vid_gen/videos/<slug>/`, same sub-layo
 - **Long (16:9):** TEMPLATES §2 story structure, intro title (§13) + outro/end card 10–20 s with YouTube end-screen space, chapters for the description.
 - **Shorts (9:16, 1080×1920):** hook in the **first 1–2 s** (motion + line), one idea, a twist/payoff at 70–85 %, loopable last frame (ends where it began), no long intro — 1 s logo sting max, title as a 1–2 s overlay, end with a 1–2 s button. Compose for vertical: characters centered, MCU/CU-heavy, title-safe 80 %, keep the bottom 20 % and right 15 % clear (platform UI). Faster pacing: shots 0.8–2.5 s.
 - **Both:** timing/staging/focus rules (TEMPLATES §12) and language-agnostic titles (§13) are mandatory.
+- **Engagement (TEMPLATES §14) — hard minimums, never one closed set:** long 5–7 min ≥ 8 locations, ≥ 50 % exterior, ≤ 60 s in one place, ≥ 2 set pieces, ≥ 3 lighting looks; Shorts ≥ 3 backdrops. Something new on screen every ≤ 5 s, re-hook every 30–45 s, characters move through space. Run the §14.5 self-check on the outline and on the timeline; fix failures before rendering.
+- **Voice acting (TEMPLATES §15):** every line gets emotion, intensity, pace, volume, pauses, emphasis, nonverbals; vary pace between lines; use the chosen TTS model's own controls (§15.3); voice QA §15.5.
 
 ## Step 3 — the ONE checkpoint with the user (single message, then continue)
-Send: logline · 6–10 beat outline · cast (names + one-line looks + voice presets) · track/format/duration/language chosen · and, only if Step 0.5 found no live link, ask for the **Kaggle ENDPOINT + TOKEN**. Continue immediately when they reply; apply any requested changes without re-asking.
+Send: logline · 6–10 beat outline · **location list + scene table with the §14.5 self-check results** · cast (names + one-line looks + voice presets) · track/format/duration/language chosen · and, only if Step 0.5 found no live link, ask for the **Kaggle ENDPOINT + TOKEN**. Continue immediately when they reply; apply any requested changes without re-asking.
 
 ## Step 4 — build (no more questions unless blocked)
 Models: core set is preinstalled; `python tools/node.py install <name>` the extra models this film needs (one or two at a time), `remove` them when their step is done (Kaggle disk cap, `AGENTS.md` §4).
