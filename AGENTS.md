@@ -59,7 +59,8 @@ vid_gen/
 12. **Language-agnostic:** never hard-code a language. Dialogue, titles, cards, disclaimers, fonts and voices come from `bible.yaml` (`languages`, `text.<lang>`, font registry TEMPLATES §13.2). Films may be English, Telugu, Hindi… or several versions.
 13. **Engaging, never static (TEMPLATES §14):** many locations (mostly open/exterior), fast visual cadence, re-hooks every 30–45 s, characters that move. A film in one closed set is a failure. **Voices are acted (§15):** emotion, pace, pauses and emphasis per line, varied line to line.
 14. **Quality bar (TEMPLATES §16):** adults are the audience — stay on the topic, every line and prop has a purpose, real emotional range (dark, funny, sad, violent-stylized, suspense…), a new palette per film, clean frames and mix, no filler, believable object handling and scale.
-15. **Ask the user only for:** Kaggle ENDPOINT + TOKEN, HF token / "Agree" on gated models, voice pick from casting reels, creative approval of the script. Decide everything else yourself.
+15. **Post-mortem rules (TEMPLATES §17, non-negotiable):** every character has its own real voice of the **correct gender** (never pitch-shift one voice into a cast; F0 QA per character) · tone follows the topic — dark topics are never played as kids' comedy · the "what if" is answered with cause→effect consequences · full script approved by the user (Gate A) and a 10–15 s sample approved (Gate B) **before** the full render · every shot reads in one sentence and characters act (no stiff poses, no overlaps) · primitive polygon figures are not acceptable final art · never claim quality you have not seen at speed.
+16. **Ask the user only for:** Kaggle ENDPOINT + TOKEN, HF token / "Agree" on gated models, voice pick from casting reels, creative approval of the script. Decide everything else yourself.
 
 ## 4. Kaggle node workflow
 1. User runs `kaggle/render_node.py` in one Kaggle cell (Accelerator **GPU T4 x2**, Internet ON) and pastes `ENDPOINT` + `TOKEN` — usually together with the video request — → write them to `.env` as `KAGGLE_URL` / `KAGGLE_TOKEN`, verify with `tools/node.py info`. The link changes every Kaggle session; if `info` fails, ask for fresh lines.
@@ -99,6 +100,9 @@ vid_gen/
 | HF download printed help, model `FAILED` | `huggingface-cli` was removed → use `huggingface_hub.snapshot_download` (python API) |
 | System disk suddenly read-only | Kaggle's hidden total-disk cap was hit (~86 GB of envs + weights + 36 GB Xet cache) → core set at boot, other models on demand + remove, `HF_HUB_DISABLE_XET=1`, download only needed files |
 | 2D films boring/off-topic: chatter, cute default palette, noisy BGM, useless props, slow walks | TEMPLATES §16 quality bar + §16.9 audit before rendering |
+| Men sounded female, whole cast sounded related | one Chatterbox base voice pitch-shifted per character → real per-character voices (Maya1 design / per-character reference clips / ElevenLabs), gender match, F0 gate (TEMPLATES §17.1) |
+| Dark topic became kids' comedy, weak story | tone follows the topic; consequence-driven "what if"; hostile script review; user approves the full script first (§17.2, §17.4) |
+| Stiff, unreadable animation (idle arms, overlapping figures, polygon heads) | one-sentence-per-shot test, acting bar, better rig or 3D, sample gate before the full render (§17.3) |
 | Model install conflicts | one uv env per model; `USE_JAX=0 USE_TF=0`; no shared transformers/numpy pins |
 
 ## 7. QA checklist (every shot, before the final render)

@@ -44,12 +44,13 @@ Film slug: lowercase-kebab of the topic (`vid_gen/videos/<slug>/`, same sub-layo
 - **Quality bar (TEMPLATES §16):** stay on the user's topic (every scene and every line has a job), adult tones with real stakes, fresh palette, clean backgrounds, only purposeful props, no filler walks/holds, believable grip/throw/catch/release, camera with intent, clean mix where music follows emotion. Run the §16.9 audit before rendering.
 - **Voice acting (TEMPLATES §15):** every line gets emotion, intensity, pace, volume, pauses, emphasis, nonverbals; vary pace between lines; use the chosen TTS model's own controls (§15.3); voice QA §15.5.
 
-## Step 3 — the ONE checkpoint with the user (single message, then continue)
-Send: logline · 6–10 beat outline · **premise + promise, tones, palette (hex), location list + scene table with the §14.5 and §16.9 check results** · cast (names + one-line looks + voice presets) · track/format/duration/language chosen · and, only if Step 0.5 found no live link, ask for the **Kaggle ENDPOINT + TOKEN**. Continue immediately when they reply; apply any requested changes without re-asking.
+## Step 3 — Gate A: checkpoint with the user (STOP and wait for approval)
+**Read `prompts/TEMPLATES.md` §17 first.** Send the **full script (every line, with speaker)**, the hostile-review result (§17.2), the voice casting table (character, gender, engine, voice id, measured F0 — §17.1) and: logline · 6–10 beat outline · **premise + promise, tones, palette (hex), location list + scene table with the §14.5 and §16.9 check results** · cast (names + one-line looks + voice presets) · track/format/duration/language chosen · and, only if Step 0.5 found no live link, ask for the **Kaggle ENDPOINT + TOKEN**. Do not generate all voices, art or renders until the user approves the script and cast. Apply requested changes and re-send only the diffs.
 
-## Step 4 — build (no more questions unless blocked)
+## Step 4 — build (Gate B before the full render)
+**Gate B:** once characters and sets exist, render a 10–15 s sample (hardest scene) with final voices and music and **wait for the user's approval** before the full render. View a 2–3 fps strip of the whole film yourself first (§17.4).
 Models: core set is preinstalled; `python tools/node.py install <name>` the extra models this film needs (one or two at a time), `remove` them when their step is done (Kaggle disk cap, `AGENTS.md` §4).
-script → voices (casting reel once if the user cares about voices; else default presets) → timeline → characters/sets → shots → build-only check → QA stills (3 per shot) → fix → 10-second sample with audio (share it) → final render → foley/SFX/music → mix (−15 LUFS) → `videos/<slug>/out/<slug>_final.mp4` (+ `_silent.mp4`, stems) → YouTube package (title/description/tags/chapters or Shorts caption + hashtags).
+script → voices (casting reel mandatory; one real voice per character, correct gender, F0 gate; never pitch-shift one voice into a cast) → timeline → characters/sets → shots → build-only check → QA stills (3 per shot) → fix → 10-second sample with audio (share it) → final render → foley/SFX/music → mix (−15 LUFS) → `videos/<slug>/out/<slug>_final.mp4` (+ `_silent.mp4`, stems) → YouTube package (title/description/tags/chapters or Shorts caption + hashtags).
 
 ## Step 5 — report
 Final file paths, duration, what was skipped or not checked (ponytail rule), and an honest note on any known flaw.

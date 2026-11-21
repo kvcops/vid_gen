@@ -396,3 +396,33 @@ Pick a **primary tone + secondary tone** in the bible from the topic; never defa
 
 ### 16.9 Pre-render audit (print a table; fix every ✗ before rendering)
 topic: every scene serves the premise ✓/✗ · lines with no job (count must be 0) · tones present (≥ 5 long / ≥ 2 Shorts) · palette differs from previous films · props without purpose (0) · filler shots (walks/holds without event: 0) · scale table consistent · interaction checklist per prop action · camera variety (no 3 similar in a row) · music cue changes at every turn · dialogue intelligibility (music ducked).
+
+## 17. Hard failures from the "What If Thanos Came First?" film (rejected by the user) — mandatory, overrides any shortcut
+That film shipped with female-sounding men, a kids-cartoon comedy script on a dark topic, and stiff, unreadable animation. Never repeat it.
+
+### 17.1 Voices: gender, identity, proof
+- **Never make characters by pitch/formant-shifting one base voice.** Every speaking character gets its **own real voice** from a TTS that supports voice design or cloning: Maya1 (describe gender/age/timbre), Step-Audio-EditX or Chatterbox with a **different reference clip per character**, Zonos3 speaker embedding, or ElevenLabs voice ids. Post-pitch only ±2 semitones, only to fine-tune.
+- **Gender must match the character.** Male = male voice, female = female voice, child = child, creature = designed creature voice. Put `gender` + `age` in every character card and in the voice prompt.
+- **Voice QA is a gate** (before the timeline is final): measure median F0 per line (librosa pyin). Male adults 80–170 Hz, female adults 165–260 Hz; any line outside its character's band → regenerate with another voice. Cast members must be audibly distinct (different reference clip/voice id, pairwise median F0 ≥ 15 Hz apart unless a different timbre is proven). Whisper transcript = script.
+- **Casting reel first:** one test sentence per character, F0 measured, shown to the user as a table (character, gender, engine, voice id, F0) before the whole script is generated.
+- Report honestly which engine and voice each character used and whether it ran on the Kaggle node.
+
+### 17.2 Story: written for the topic, not for gags
+- **Tone = what the topic implies.** A villain / war / invasion / "what if" topic is **serious by default** (dread, stakes, loss, irony). Humour is dry, rare (max 1 beat per scene) and never undercuts a threat. **No kids-cartoon comedy, catchphrase quips, puns, or sight-gags that make the antagonist a clown** unless the user asks for comedy.
+- **A "what if" must be answered with consequences:** a cause → effect chain (what changes first, who is unprepared, what the world loses, the new equilibrium or twist). Nothing happens "because the script needs it". Every scene ends on a changed situation.
+- **Characters from existing IP keep their core personality, powers and rules.** No out-of-character behaviour for a cheap laugh.
+- **Script quality gate (before any voice or art):** write the full dialogue, then run a hostile review and fix it: (a) can any line be cut with no loss, (b) do two characters share the same rhythm or diction, (c) is any joke not needed by the premise, (d) does each character act from a want, (e) would a fan of the source accept the logic. Print the review.
+- **Show the full script (every line) to the user and wait for approval.** Outline-only approval is not enough.
+
+### 17.3 Animation: it must read, and it must act
+- **Every shot shows one clear action in one clear sentence** (write it in the screenplay `function`). If a still does not show who does what to whom, reject the shot. No character standing with an arm stretched out for seconds, no figures sliding around, no characters overlapping each other.
+- **Acting bar:** eyes lead the head and body (§12.2), weight shifts, anticipation + follow-through on every hit/throw, reaction shots, cuts on action. No body movement for more than 1.5 s unless it is a deliberate hold.
+- **Character-art bar:** distinct silhouettes, recognisable costume and prop shapes, hands that grip, a head that turns (3/4 and profile), mouths that match visemes, believable anatomy. **Primitive polygon-head + capsule-limb figures are not acceptable final art.** If the procedural vector rig cannot reach this bar, build a better rig (layered parts, hands, hair, cloth) or switch to the 3D track. Never ship it and call it done.
+- **Staging:** the geography of a fight or chase is visible (who is where, what is hit); big events get wide + impact + reaction.
+- **Self-critique:** view the contact sheets and write one line per shot "what a stranger sees". Any shot that reads wrong is fixed. Judge against real YouTube animation, not against "it renders".
+
+### 17.4 Process gates (stop and wait for the user)
+1. **Gate A:** full script + cast table (voice ids, gender, F0) + tone/palette → user approves.
+2. **Gate B:** a 10–15 s sample with final voices, music and the hardest scene → user approves.
+3. Only then the full render. Never produce the whole film before Gate B.
+4. Never say "done" or "reads well" about a film whose frames you have not viewed at speed (extract a 2–3 fps strip across the whole film and view it).

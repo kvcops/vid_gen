@@ -12,6 +12,8 @@
 
 > **Engagement + voice acting:** follow `TEMPLATES.md` §14 (many locations, mostly exterior, fast cadence, re-hooks — never one closed set) and §15 (per-line emotion/pace/pauses, per-model TTS controls). Run the §14.5 self-check before rendering.
 
+> **Hard rules (TEMPLATES §17):** per-character real voices of the right gender with F0 QA · tone from the topic (no kids' comedy on dark topics) · consequence-driven script approved by the user first · shots must read and characters must act · polygon/capsule figures are not final art · Gate A (script + cast) and Gate B (10 s sample) before the full render.
+
 > **Step 0:** load the ponytail skill first (`.agents/skills/ponytail/SKILL.md`, level full) and follow `AGENTS.md` §0 — minimal code and short replies, but never skip QA or requested features.
 
 ## 0. FILL THIS
