@@ -5,8 +5,8 @@
 #    1. Detects GPUs and picks a GPU policy (P100: one GPU for everything · T4x2: GPU0 = Blender, GPU1 = AI models)
 #    2. Installs Blender 5.x + the NVIDIA EGL fix (GPU EEVEE) and runs a smoke test
 #    3. Starts a token-protected API + public HTTPS tunnel  ->  prints ENDPOINT and TOKEN  (paste both to your agent)
-#    4. Installs the AI model environments in the BACKGROUND (voices, foley, sfx, music, motion, whisper)
-#       — check progress with  GET /models ; each model lives in its own isolated uv env
+#    4. Installs a small core set of AI models in the BACKGROUND; the agent installs/removes the rest per film
+#       (disk is capped) — check  GET /models ; each model lives in its own isolated uv env
 #  Keep this tab open. The cell keeps running (heartbeat every 10 min).
 # =====================================================================================================================
 import os, re, glob, json, time, shutil, secrets, signal, tarfile, threading, subprocess, urllib.request, uuid
@@ -18,11 +18,10 @@ BIG      = '/root/vg'                        # big system disk (TBs): /kaggle/wo
 ENVS     = f'{BIG}/envs'                     # one isolated python env per model (same disk as uv cache -> torch hardlinked, stored once)
 MODELS   = f'{BIG}/models'                   # cloned repos + downloaded weights
 BLENDER_SERIES = '5.3'                       # newest patch of this series is downloaded automatically
-TRACK    = 'both'                            # '3d' · '2d' · 'both'  -> which model set to install
-AUDIO_MODELS = ['whisper', 'chatterbox', 'maya1', 'step_editx', 'moss_sfx', 'ace_step', 'hy_foley', 'zonos3']
-MODELS_3D    = ['hy_motion']                                        # text -> body motion
-MODELS_2D    = ['rhubarb', 'vector2d']                          # lip-sync visemes + vector renderer/title libs (no image models)
-INSTALL_MODELS = AUDIO_MODELS + (MODELS_3D if TRACK in ('3d', 'both') else []) + (MODELS_2D if TRACK in ('2d', 'both') else [])
+# Kaggle caps total disk (~80-100 GB incl. caches; over it the system disk turns READ-ONLY). All models together are
+# ~120 GB, so only this small core set installs at boot. Agents install others per film (POST /models/install/<name>)
+# and remove them after use (POST /models/remove/<name>).
+BOOT_MODELS = ['whisper', 'chatterbox', 'rhubarb', 'vector2d']
 HF_TOKEN = os.environ.get('HF_TOKEN', '')    # or upload .env later; gated models need it (click "Agree" on their pages)
 
 # Each model: python version, pip packages, optional git repo (+ its requirements), HF weights to pre-download.
@@ -31,12 +30,13 @@ MODEL_SPECS = {
     'whisper':    dict(py='3.11', pip=['faster-whisper'], hf=[]),
     'chatterbox': dict(py='3.11', pip=['chatterbox-tts', 'soundfile'], hf=['ResembleAI/chatterbox-turbo']),
     'maya1':      dict(py='3.11', pip=['transformers', 'accelerate', 'snac', 'soundfile'], hf=['maya-research/maya1']),
-    'step_editx': dict(py='3.12', repo='https://github.com/stepfun-ai/Step-Audio-EditX', hf=['stepfun-ai/Step-Audio-EditX', 'stepfun-ai/Step-Audio-Tokenizer']),
+    'step_editx': dict(py='3.12', repo='https://github.com/stepfun-ai/Step-Audio-EditX', hf=['stepfun-ai/Step-Audio-EditX', 'stepfun-ai/Step-Audio-Tokenizer'], cuda='cu128'),   # vllm needs CUDA 12.8 libs (T4 ok, not P100)
     'moss_sfx':   dict(py='3.11', repo='https://github.com/OpenMOSS/MOSS-TTS', hf=[]),
     'ace_step':   dict(py='3.11', repo='https://github.com/ace-step/ACE-Step', hf=[]),
-    'hy_foley':   dict(py='3.10', repo='https://github.com/Tencent-Hunyuan/HunyuanVideo-Foley', hf=['tencent/HunyuanVideo-Foley']),
+    'hy_foley':   dict(py='3.10', repo='https://github.com/Tencent-Hunyuan/HunyuanVideo-Foley', hf=['tencent/HunyuanVideo-Foley'],
+                   hf_allow=['hunyuanvideo_foley_xl.pth', 'vae_128d_48k.pth', 'synchformer_state_dict.pth', '*.json', '*.yaml']),   # XL only: 8 GB, not 18
     'hy_motion':  dict(py='3.10', repo='https://github.com/Tencent-Hunyuan/HY-Motion-1.0', hf=[]),
-    'zonos3':     dict(py='3.11', pip=['soundfile'], hf=['Zyphra/ZONOS3-Mini']),
+    'zonos3':     dict(py='3.11', pip=['soundfile'], hf=['Zyphra/ZONOS3-Mini'], hf_ignore=['gguf/*']),   # shortcut: skips llama.cpp copies (~10 GB); add back if its loader wants gguf
     # ---- 2D track ----
     'rhubarb':    dict(shell='wget -q https://github.com/DanielSWolf/rhubarb-lip-sync/releases/download/v1.14.0/Rhubarb-Lip-Sync-1.14.0-Linux.zip '
                          '-O /tmp/rh.zip && unzip -oq /tmp/rh.zip -d {MODELS}/rhubarb'),            # CPU lip-sync visemes (MIT)
@@ -113,21 +113,23 @@ _, smoke = sh(f'{W}/blender/blender -b --factory-startup --python {W}/smoke.py 2
 log(f'      EEVEE smoke test: {smoke.replace(chr(10), " | ")}   (2nd value should be < 2 s)')
 
 # ------------------------------------------------------------- 4. AI model environments (background installer)
-MODEL_STATE = {m: 'queued' for m in INSTALL_MODELS}
+MODEL_STATE = {m: 'queued' if m in BOOT_MODELS else 'not installed' for m in MODEL_SPECS}
 
 def install_model(name):
     spec = MODEL_SPECS[name]; env_dir = f'{ENVS}/{name}'; py = f'{env_dir}/bin/python'
+    tix = TORCH_INDEX.replace('cu126', spec['cuda']) if spec.get('cuda') else TORCH_INDEX
     logf = open(f'{W}/install_{name}.log', 'w')
     def step(cmd):
         logf.write(f'$ {cmd}\n'); logf.flush()
-        r = subprocess.run(cmd, shell=True, stdout=logf, stderr=subprocess.STDOUT, env=dict(os.environ, HF_TOKEN=HF_TOKEN))
+        r = subprocess.run(cmd, shell=True, stdout=logf, stderr=subprocess.STDOUT,   # Xet off: it stalled and kept a 2nd copy of every weight
+                           env=dict(os.environ, HF_TOKEN=HF_TOKEN, HF_HUB_DISABLE_XET='1'))
         if r.returncode: raise RuntimeError(f'failed: {cmd[:120]}')
     try:
         MODEL_STATE[name] = 'installing'
         if spec.get('shell'):                                   # plain download (no python env needed)
             step(spec['shell'].format(MODELS=MODELS)); MODEL_STATE[name] = 'ready'; return
         step(f'uv venv {env_dir} --python {spec["py"]} -q')
-        step(f'uv pip install --python {py} -q torch torchaudio --index-url {TORCH_INDEX}')
+        step(f'uv pip install --python {py} -q torch torchaudio --index-url {tix}')
         if spec.get('repo'):
             repo_dir = f'{MODELS}/{name}'
             if not os.path.exists(repo_dir): step(f'git clone --depth 1 {spec["repo"]} {repo_dir}')
@@ -139,13 +141,14 @@ def install_model(name):
             if os.path.exists(f'{repo_dir}/setup.py') or os.path.exists(f'{repo_dir}/pyproject.toml'):
                 has_req = any(os.path.exists(f'{repo_dir}/{r}') for r in ('requirements.txt', 'requirements-inference.txt'))
                 # pyproject-only repos carry their deps there -> install them (CUDA torch index kept available)
-                step(f'uv pip install --python {py} -q {"--no-deps " if has_req else f"--extra-index-url {TORCH_INDEX} "}-e {repo_dir}')
+                step(f'uv pip install --python {py} -q {"--no-deps " if has_req else f"--extra-index-url {tix} --index-strategy unsafe-best-match "}-e {repo_dir}')
         if spec.get('pip'): step(f'uv pip install --python {py} -q ' + ' '.join(spec['pip']))
         step(f'uv pip install --python {py} -q huggingface_hub soundfile numpy')
         for repo_id in spec.get('hf', []):   # python API: the old huggingface-cli is gone; token stays out of the log
             dest = f'{MODELS}/hf/{repo_id.replace("/", "__")}'
             step(f'{py} -c "import os; from huggingface_hub import snapshot_download as s; '
-                 f's(\'{repo_id}\', local_dir=\'{dest}\', token=os.environ.get(\'HF_TOKEN\') or None)"')
+                 f's(\'{repo_id}\', local_dir=\'{dest}\', token=os.environ.get(\'HF_TOKEN\') or None, '
+                 f'allow_patterns={spec.get("hf_allow")!r}, ignore_patterns={spec.get("hf_ignore")!r})"')
         step(f'CUDA_VISIBLE_DEVICES={MODEL_GPU} {py} -c "import torch; torch.zeros(1).cuda(); print(\'cuda ok\', torch.__version__)"')
         MODEL_STATE[name] = 'ready'
     except Exception as e:
@@ -154,7 +157,7 @@ def install_model(name):
         logf.close(); log(f'      model {name}: {MODEL_STATE[name]}')
 
 def installer():
-    for m in INSTALL_MODELS: install_model(m)     # sequential: keeps disk/network sane
+    for m in BOOT_MODELS: install_model(m)        # sequential: keeps disk/network sane
 
 # --------------------------------------------------------------------------------------------- 5. API + tunnel
 log('[4/5] API server ...')
@@ -192,6 +195,16 @@ def models_install(name: str, x_token: str = Header(None)):
     auth(x_token)
     if name not in MODEL_SPECS: raise HTTPException(404, 'unknown model')
     MODEL_STATE[name] = 'queued'; threading.Thread(target=install_model, args=(name,), daemon=True).start()
+    return {'ok': True}
+
+@app.post('/models/remove/{name}')
+def models_remove(name: str, x_token: str = Header(None)):
+    auth(x_token)
+    if name not in MODEL_SPECS: raise HTTPException(404, 'unknown model')
+    spec = MODEL_SPECS[name]
+    for d in [f'{ENVS}/{name}', f'{MODELS}/{name}'] + [f'{MODELS}/hf/{r.replace("/", "__")}' for r in spec.get('hf', [])]:
+        shutil.rmtree(d, ignore_errors=True)
+    MODEL_STATE[name] = 'not installed'
     return {'ok': True}
 
 @app.post('/upload')
@@ -273,11 +286,11 @@ print(f'ENDPOINT : {URL}')
 print(f'TOKEN    : {TOKEN}')
 print('=' * 78)
 print(f'GPU policy : render on GPU {RENDER_GPU} · AI models on GPU {MODEL_GPU}' + ('  (P100: run models BEFORE rendering)' if MODEL_GPU == RENDER_GPU else ''))
-print('Models     : installing in background → check GET /models  (paste ENDPOINT + TOKEN to your agent now)')
+print(f'Models     : core set {BOOT_MODELS} installing in background · others on demand  (paste ENDPOINT + TOKEN to your agent now)')
 print('Keep this tab open — this cell keeps running.\n', flush=True)
 
 while True:                                                                         # heartbeat keeps the session alive
     time.sleep(600)
     running = sum(v['proc'].poll() is None for v in JOBS.values())
-    ready = sum(s == 'ready' for s in MODEL_STATE.values())
-    log(f'alive · jobs running {running} · models ready {ready}/{len(MODEL_STATE)}')
+    ready = [m for m, s in MODEL_STATE.items() if s == 'ready']
+    log(f'alive · jobs running {running} · models ready {ready}')

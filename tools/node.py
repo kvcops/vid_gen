@@ -40,3 +40,5 @@ if __name__ == '__main__':
     elif c == 'push': print(push(a[1] if len(a) > 1 else '.', a[2:]))
     elif c == 'run': print(run(a[1], a[2], a[3]))
     elif c == 'get': print(get(a[1], a[2]))
+    elif c == 'models': print(req('GET', '/models'))
+    elif c in ('install', 'remove'): print(req('POST', f'/models/{c}/{a[1]}'))

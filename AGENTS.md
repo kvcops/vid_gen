@@ -63,7 +63,7 @@ vid_gen/
 1. User runs `kaggle/render_node.py` in one Kaggle cell (Accelerator **GPU T4 x2**, Internet ON) and pastes `ENDPOINT` + `TOKEN` — usually together with the video request — → write them to `.env` as `KAGGLE_URL` / `KAGGLE_TOKEN`, verify with `tools/node.py info`. The link changes every Kaggle session; if `info` fails, ask for fresh lines.
 2. `python tools/node.py info` (GPUs, disk, jobs, model install states) · `push <film_dir> [extra files]` · `run <name> <gpu> "<cmd>"` · `log <name> [tail]` · `kill <name>` · `ls <path>` · `get <remote> <local>`.
 3. GPU policy: **Blender EEVEE always renders on GPU 0** on Kaggle (EGL picks it; don't try to move it). On T4 x2 run AI models on **GPU 1** (`CUDA_VISIBLE_DEVICES=1` works for CUDA). On a single GPU run models before rendering.
-4. Model envs live in `/root/vg/envs/<name>` and weights in `/root/vg/models` (big system disk; `/kaggle/working` is only 20 GB — keep it for renders). Run a model with `$ENVS/<name>/bin/python ...`. Check `GET /models` for `ready` / `FAILED`; retry one with `POST /models/install/<name>`.
+4. Model envs live in `/root/vg/envs/<name>` and weights in `/root/vg/models` (big system disk; `/kaggle/working` is only 20 GB — keep it for renders). Run a model with `$ENVS/<name>/bin/python ...`. Only the core set (whisper, chatterbox, rhubarb, vector2d) installs at boot. **Kaggle caps total disk (~80–100 GB; over it the system disk turns read-only and the session is dead)** — so install a model only when the film needs it (`tools/node.py install <name>`, wait for `ready` in `tools/node.py models`) and `tools/node.py remove <name>` when done. Big ones: zonos3 ~21 GB, hy_foley ~12 GB, step_editx ~19 GB.
 5. Download only final mp4/wav (assemble clips on the node). Never pull thousands of frames.
 
 ## 5. Model stack (commercial-OK, fits 16 GB; details in the master prompts)
@@ -95,6 +95,7 @@ vid_gen/
 | Killed real renders | never kill by PID; use `/kill/<job>` |
 | Kaggle disk full, every model `FAILED` | envs on 20 GB `/kaggle/working` while uv cache is on `/` → torch copied per env. Keep envs + weights on `/root/vg` (same disk as the cache → hardlinked once) |
 | HF download printed help, model `FAILED` | `huggingface-cli` was removed → use `huggingface_hub.snapshot_download` (python API) |
+| System disk suddenly read-only | Kaggle's hidden total-disk cap was hit (~86 GB of envs + weights + 36 GB Xet cache) → core set at boot, other models on demand + remove, `HF_HUB_DISABLE_XET=1`, download only needed files |
 | Model install conflicts | one uv env per model; `USE_JAX=0 USE_TF=0`; no shared transformers/numpy pins |
 
 ## 7. QA checklist (every shot, before the final render)
@@ -103,6 +104,7 @@ vid_gen/
 ## 8. Commands cheat-sheet
 ```bash
 python tools/node.py info
+python tools/node.py install hy_foley ; python tools/node.py models ; python tools/node.py remove hy_foley   # on-demand models
 python tools/node.py push videos/<film> audio/dialogue.wav           # upload a film folder
 python tools/node.py run qa0 0 "python3 blender/qa_batch.py 0"   # jobs run inside the uploaded film folder
 python tools/node.py log qa0 40

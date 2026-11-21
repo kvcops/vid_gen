@@ -45,6 +45,7 @@ Film slug: lowercase-kebab of the topic (`vid_gen/videos/<slug>/`, same sub-layo
 Send: logline · 6–10 beat outline · cast (names + one-line looks + voice presets) · track/format/duration/language chosen · and, only if Step 0.5 found no live link, ask for the **Kaggle ENDPOINT + TOKEN**. Continue immediately when they reply; apply any requested changes without re-asking.
 
 ## Step 4 — build (no more questions unless blocked)
+Models: core set is preinstalled; `python tools/node.py install <name>` the extra models this film needs (one or two at a time), `remove` them when their step is done (Kaggle disk cap, `AGENTS.md` §4).
 script → voices (casting reel once if the user cares about voices; else default presets) → timeline → characters/sets → shots → build-only check → QA stills (3 per shot) → fix → 10-second sample with audio (share it) → final render → foley/SFX/music → mix (−15 LUFS) → `videos/<slug>/out/<slug>_final.mp4` (+ `_silent.mp4`, stems) → YouTube package (title/description/tags/chapters or Shorts caption + hashtags).
 
 ## Step 5 — report
