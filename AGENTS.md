@@ -58,7 +58,8 @@ vid_gen/
 11. **No image-generation models** for characters, sets or animation — vector or 3D geometry only. Raster only for user-made thumbnails.
 12. **Language-agnostic:** never hard-code a language. Dialogue, titles, cards, disclaimers, fonts and voices come from `bible.yaml` (`languages`, `text.<lang>`, font registry TEMPLATES §13.2). Films may be English, Telugu, Hindi… or several versions.
 13. **Engaging, never static (TEMPLATES §14):** many locations (mostly open/exterior), fast visual cadence, re-hooks every 30–45 s, characters that move. A film in one closed set is a failure. **Voices are acted (§15):** emotion, pace, pauses and emphasis per line, varied line to line.
-14. **Ask the user only for:** Kaggle ENDPOINT + TOKEN, HF token / "Agree" on gated models, voice pick from casting reels, creative approval of the script. Decide everything else yourself.
+14. **Quality bar (TEMPLATES §16):** adults are the audience — stay on the topic, every line and prop has a purpose, real emotional range (dark, funny, sad, violent-stylized, suspense…), a new palette per film, clean frames and mix, no filler, believable object handling and scale.
+15. **Ask the user only for:** Kaggle ENDPOINT + TOKEN, HF token / "Agree" on gated models, voice pick from casting reels, creative approval of the script. Decide everything else yourself.
 
 ## 4. Kaggle node workflow
 1. User runs `kaggle/render_node.py` in one Kaggle cell (Accelerator **GPU T4 x2**, Internet ON) and pastes `ENDPOINT` + `TOKEN` — usually together with the video request — → write them to `.env` as `KAGGLE_URL` / `KAGGLE_TOKEN`, verify with `tools/node.py info`. The link changes every Kaggle session; if `info` fails, ask for fresh lines.
@@ -97,6 +98,7 @@ vid_gen/
 | Kaggle disk full, every model `FAILED` | envs on 20 GB `/kaggle/working` while uv cache is on `/` → torch copied per env. Keep envs + weights on `/root/vg` (same disk as the cache → hardlinked once) |
 | HF download printed help, model `FAILED` | `huggingface-cli` was removed → use `huggingface_hub.snapshot_download` (python API) |
 | System disk suddenly read-only | Kaggle's hidden total-disk cap was hit (~86 GB of envs + weights + 36 GB Xet cache) → core set at boot, other models on demand + remove, `HF_HUB_DISABLE_XET=1`, download only needed files |
+| 2D films boring/off-topic: chatter, cute default palette, noisy BGM, useless props, slow walks | TEMPLATES §16 quality bar + §16.9 audit before rendering |
 | Model install conflicts | one uv env per model; `USE_JAX=0 USE_TF=0`; no shared transformers/numpy pins |
 
 ## 7. QA checklist (every shot, before the final render)

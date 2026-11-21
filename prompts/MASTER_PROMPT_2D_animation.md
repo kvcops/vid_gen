@@ -8,13 +8,16 @@
 > front/¾/profile/back body angles, walk cycles with staggered joints, damped-spring hair/cloth, camera + transitions) and
 > **Rigby2D** (open-source 2D skeletal animator: auto-rig layered SVG, IK, mesh bending, physics, lip-sync, video render).
 
+> **Quality bar:** `TEMPLATES.md` §16 is mandatory — adult audience, on-topic purposeful dialogue, wide emotional range, a new palette per film, clean backgrounds, no useless props, no filler, real object handling, intentional camera, clean mix. Audit §16.9 before rendering.
+
 > **Engagement + voice acting:** follow `TEMPLATES.md` §14 (many locations, mostly exterior, fast cadence, re-hooks — never one closed set) and §15 (per-line emotion/pace/pauses, per-model TTS controls). Run the §14.5 self-check before rendering.
 
 > **Step 0:** load the ponytail skill first (`.agents/skills/ponytail/SKILL.md`, level full) and follow `AGENTS.md` §0 — minimal code and short replies, but never skip QA or requested features.
 
 ## 0. FILL THIS
 - Story idea: <<...>> · Languages: <<main: en (default) | te | hi | …; extra versions>> · Length: <<5–7 min 16:9 + Shorts>>
-- **Vector style:** <<FLAT_CARTOON (default: bold outlines, flat fills, 1 cel shadow) | THIN_LINE_PASTEL | NO_OUTLINE_SHAPES (Kurzgesagt-like) | PAPER_CUTOUT (texture + drop shadow) | NOIR_SILHOUETTE>>
+- **Tone:** <<primary + secondary, adult (dark humour / suspense / action / tragedy …) — never default cute>> · **Palette:** <<5–7 hex + accent, chosen from tone, different from previous films>>
+- **Vector style:** <<FLAT_CARTOON (bold outlines, flat fills, 1 cel shadow) | THIN_LINE_PASTEL | NO_OUTLINE_SHAPES (Kurzgesagt-like) | PAPER_CUTOUT (texture + drop shadow) | NOIR_SILHOUETTE>>
 - Characters: <<names + one-line roles>> · Commercial use: <<yes>>
 
 ## 1. WHY 2D VECTOR
@@ -30,7 +33,7 @@
 | Optional hand-made art | SVG files from Inkscape/Illustrator with layer ids following §4 naming → auto-rigged (Rigby2D-style) |
 | Lip-sync | **Rhubarb Lip Sync** (MIT, CPU, `-r phonetic` works for any language) → shapes A–H, X |
 | Word timing / emphasis | faster-whisper word timestamps |
-| Voices / SFX / music / mix | same as 3D track (`MASTER_PROMPT_animation_pipeline.md` §2, §7) |
+| Voices / SFX / music / mix | music changes per scene emotion, ducked 8–12 dB under speech, silence before shocks (TEMPLATES §16.8); same tools as 3D track (`MASTER_PROMPT_animation_pipeline.md` §2, §7) |
 | Text / titles | uharfbuzz + fontTools → glyph outlines as vector paths (any language/script: Latin, Indic, Arabic…; fonts per script from TEMPLATES §13.2) — see TEMPLATES §13 |
 
 ## 3. CHARACTER CONSTRUCTION (procedural vector)
@@ -53,7 +56,7 @@ Bones: `root, hips, chest, neck, head, upperarm_L/R, forearm_L/R, hand_L/R, thig
 - **Walk/run cycles:** 8 / 6 keys per cycle, staggered joints (hips lead, shoulders counter-rotate, head bob), root speed = stride / cycle time (feet never slide), contact frames get dust puffs on runs.
 - **Talking:** Rhubarb visemes on exact time codes (hold ≥ 2 frames, blend 1 frame), blinks every 2.5–5 s (4-frame blink), brow/head accents on stressed words (Whisper timings), breathing squash ±1 %.
 - **Staging, tracking, focus, orientation, timing:** follow TEMPLATES §12 exactly.
-- **Backgrounds:** vector parallax layers (sky gradient, far silhouettes, mid set, near props, foreground framing elements), 1.5–2× frame width for pans, atmospheric perspective (far layers lighter/bluer, lower contrast), time-of-day palettes.
+- **Backgrounds (quiet, purposeful):** lower contrast/saturation and fewer details than characters, no busy patterns behind faces, only props that matter (§16.4), correct scale; vector parallax layers (sky gradient, far silhouettes, mid set, near props, foreground framing elements), 1.5–2× frame width for pans, atmospheric perspective (far layers lighter/bluer, lower contrast), time-of-day palettes.
 - **FX (vector):** dust puffs, impact stars, sweat drops, anger veins, sparkles, speed lines, motion trails, rain, splashes, smoke, embers — procedural particle systems drawing paths.
 - **Camera 2D:** virtual camera (x, y, zoom, rotation) with damped follow, lead room, shake (Perlin, decaying), push-ins, whip pans with directional blur, split screens, iris/wipe transitions.
 

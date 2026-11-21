@@ -8,10 +8,12 @@ Agents: copy the block, fill every `<...>`, save under `<film>/story/` or `<film
 ```yaml
 title: "<title>"
 logline: "<one sentence: who wants what, what stops them, the twist>"
+premise: "<the user's topic as one sentence — every scene must serve it (§16.1)>"
+promise: "<what the viewer is waiting to see / gets at the end>"
 track: 3d | 2d
 style_preset: STYLIZED_3D | SEMI_REAL | TOON | FLAT_CARTOON | ANIME_CEL | STORYBOOK_PAINTED | PAPER_CUTOUT
-tone: {comedy: 0.6, action: 0.3, emotion: 0.1}
-audience: "<e.g. Indian YouTube (English/Telugu), 13+>"
+tone: {primary: "<dark humour | satire | suspense | action | tragedy | horror-tinged | …>", secondary: "<…>", beats: [dread, laugh, anger, grief, triumph]}   # adult range, never default cute (§16.2)
+audience: "adults 18–35 (YouTube); not kids"
 languages:
   main: en                     # ISO code of dialogue + titles: en | te | hi | ta | kn | ml | bn | …
   extra: []                    # other versions to produce, e.g. [te] for an English + Telugu release
@@ -19,7 +21,7 @@ title_mode: single             # single | dual_stacked | dual_sequential | per_v
 text:                          # every on-screen string, per language (never hard-code text in code)
   en: {title: "<English title>", subtitle: "<tagline>", to_be_continued: "To be continued...", disclaimer: "<fan-made fiction disclaimer>"}
   te: {title: "<Telugu title>", subtitle: "<...>", to_be_continued: "<...>", disclaimer: "<...>"}
-palette: ["#<hex>", "#<hex>", "#<hex>", "#<hex>", "#<hex>", "#<hex>"]
+palette: {name: "<e.g. neo-noir teal/amber>", colors: ["#<hex>", "#<hex>", "#<hex>", "#<hex>", "#<hex>"], accent: "#<hex>"}   # from tone; must differ from every earlier film (§16.3)
 line: {weight_px_1080p: 4, color: "#1a1410"}            # 2D only
 shading: flat | one_cel_shadow | soft_gradient          # 2D only
 world: {era: "<...>", region: "<...>", recurring_motifs: ["<...>", "<...>"]}
@@ -47,7 +49,7 @@ disclaimer: "<fan-made fictional parody, entertainment only>"   # when parodying
 | Climax | 60–85 % | action set piece + hero entry |
 | Twist 2 / cliffhanger | 85–95 % | sets up Part 2 |
 | Button / outro | 95–100 % | callback joke + end card |
-Rules: **move to a new location every 30–60 s (§14)** · a laugh or reveal every 20–30 s · every scene ends on a turn · callbacks to earlier jokes · max 2 lines per speech, ≤ 18 words each · stage directions in `action` beats, not in dialogue.
+Rules: **every scene serves the topic (§16.1)** · **move to a new location every 30–60 s (§14)** · a laugh or reveal every 20–30 s · every scene ends on a turn · callbacks to earlier jokes · max 2 lines per speech, ≤ 18 words each · stage directions in `action` beats, not in dialogue.
 
 ## 3. Character card — `<film>/story/characters/<ID>.yaml`
 ```yaml
@@ -333,3 +335,64 @@ A flat, same-speed read kills a video even with great pictures. Direct every lin
 - Key lines (hook, punchlines, reveals): generate 2–3 takes and pick the best.
 ### 15.5 Voice QA (before the timeline is final)
 Whisper transcript vs script (no missing/extra words) · per-line pitch variance and words/min (flag monotone or wrong-pace lines and regenerate) · loudness matched per character · emotions match the picture (§5) · lines land on the beat timings of §12.5.
+
+## 16. Quality bar — gripping, adult, purposeful (mandatory for 2D and 3D; audit before rendering)
+The audience is **adults**, not kids. Every second must earn its place. If a frame, line, object or sound does nothing for the story, cut it.
+
+### 16.1 Topic discipline (the #1 failure)
+- Write a one-sentence **premise** from the user's topic and a **"what the viewer gets"** promise. Every scene must move the premise forward, raise its stakes, or pay it off. Off-topic scenes, side chatter and random gags not tied to the topic are deleted.
+- **Every line of dialogue must do one job:** reveal character, push the plot, set up or land a joke, raise tension, or deliver information the viewer needs. Lines that do none (greetings, "let's go", repeating what we just saw, describing the obvious) are removed.
+- No characters explaining what is on screen. Show it. Max one line of exposition in a row.
+- Dialogue density: long films 40–60 % of runtime has speech; leave room for action, reactions and music. Shorts: lines only where they hit.
+- Audit: for each line write its job in `story/line_audit.yaml`; any line with no job → delete or rewrite.
+
+### 16.2 Tone — adult range, never default "light and cute"
+Pick a **primary tone + secondary tone** in the bible from the topic; never default to cheerful/kid-friendly. Range to use: dark humour, satire, deadpan, absurd, slapstick, suspense, thriller, horror-tinged, crime, action/violence, revenge, tragedy, melancholy, romance, triumph, cringe/awkward, rage, fear, paranoia.
+- A long film shows **at least 5 distinct emotional colours** (e.g. dread → laugh → anger → grief → triumph); Shorts at least 2 (a turn).
+- Contrast drives impact: a laugh right after tension, silence before a shock, a sad beat inside comedy.
+- Stakes are real: characters can fail, get hurt, lose things, die off-screen, be betrayed. Consequences carry into later scenes.
+- Characters have edges: selfish, cowardly, ruthless, petty, obsessed, sarcastic — not just "nice".
+- Violence and darkness are **stylized and implied** (impact frames, silhouettes, cutaways, sound, aftermath) — no gore, no real-world tragedy mockery, no hate toward real groups, no sexual content: keeps YouTube monetization safe.
+
+### 16.3 Colour & look — a new palette every film
+- Choose the palette from the tone in the bible (`style.palette`: 5–7 hex colours + `accent`), and **never reuse the previous film's palette** (check `videos/*/story/bible.yaml`). Examples: neo-noir teal/amber, blood-red + bone + ink black, sickly green horror, desaturated war grey + rust, sunset magenta/orange, cold moonlit blue, vintage film sepia, acid neon night, monochrome + one red accent.
+- Each location gets its own variation (temperature, time of day) while keeping the film's palette. Darker scenes are allowed and encouraged when the tone wants them: deep shadows, rim light, single key light, fog, night.
+- Value contrast: the subject is always the clearest read (lightest or most saturated); backgrounds are quieter (lower contrast, less saturation, softer detail).
+
+### 16.4 Clean, purposeful frames
+- **No useless objects.** Every prop/set piece must either be used (held, broken, thrown, hidden in), tell us about the place/character, or set up a later payoff (Chekhov's gun). Decorative clutter that competes with the subject is removed.
+- Backgrounds support, never compete: simplified shapes, fewer details than characters, no busy patterns behind faces, depth via haze/blur/value.
+- Scale is correct and consistent: doors ~2.1 m, cups fit a hand, a car is ~4.5 m, a boat dwarfs a person; the same prop keeps the same size in every shot (store real sizes in the scene map §12.1).
+- Composition: one clear subject, rule of thirds, foreground framing for depth, negative space toward where a character looks or moves.
+
+### 16.5 No filler time
+- Banned: slow smooth walks with nothing happening, long establishing shots without information, characters standing waiting, repeated actions, slow fades between ordinary scenes.
+- Travel = cut it (exit frame → arrive) or montage 3–5 quick shots with music; a walk on screen only if something happens during it (argument, chase, reveal).
+- Enter scenes late, leave early. Start the shot mid-action. Speed ramps on action, cut on movement.
+- Holds are only for jokes, shocks and emotion (§12.5 timings) — and then they are deliberate.
+
+### 16.6 Object interaction & physical acting (must look real)
+- **Grip:** the hand closes around the object (fingers wrap, thumb opposed), the object is parented to the hand bone for the whole hold, with no floating gap and no passing through fingers. Heavy objects use two hands and the body leans/sags.
+- **Pick up:** look → reach (anticipation) → contact frame → lift with weight (slower for heavy) → settle.
+- **Throw:** wind-up 6–10 frames → release on the forward arc → object follows a ballistic arc with spin → target reacts on impact (squash, debris, sound) → thrower follow-through.
+- **Catch:** eyes track the object → hands move to meet it before arrival → impact absorbs (hands/arm give 2–4 frames) → secure grip.
+- **Release / drop:** fingers open first, object falls with gravity, bounces/settles with sound; never vanishes.
+- **Ignore / reject:** the character looks away first, then the body turns; the offered object stays visible in the other character's hand.
+- **Hand-offs:** both hands touch for ≥ 2 frames; ownership switches on contact.
+- Contacts: feet plant without sliding, hands touch surfaces they lean on, sitting compresses on the seat, objects cast contact shadows.
+- Hit reactions: impact frame, recoil in the hit direction, delayed overlap (head, hair, clothes), recovery or collapse.
+
+### 16.7 Camera with intent
+- Every shot has a reason: reveal, emphasize, isolate, follow, or disorient. Choose lens/angle from the emotion: low angle = power/threat, high angle = weakness, dutch = unease, extreme CU = intensity, wide = isolation/scale, handheld shake = chaos.
+- Vary shot sizes (wide → medium → close) and angles; never 3 similar shots in a row. Use push-ins on realisations, crash zooms on comic beats, POV shots for suspense, over-the-shoulder for confrontations.
+- The camera tracks the most important object/person (§12.3): a thrown object, a raised weapon, a reacting face.
+
+### 16.8 Sound: clean, purposeful, never noisy
+- **Dialogue is king:** speech peaks clear on top; music ducks 8–12 dB under every line; ambience sits 18–25 dB below dialogue.
+- **Music follows the emotion of each scene** — change cues at turns (suspense pulse, comic sting, sad piano, action drums); use **silence** before shocks and punchlines. No single loop wallpapering the whole film; no constant busy track under dialogue.
+- Ambience is light and specific to the place (two or three layers max). No hiss, hum, or random noise beds.
+- Every visible action that should make sound has one (footsteps on the right surface, grab, throw whoosh, impact, cloth, water); sounds that match nothing on screen are removed.
+- Final mix −14 to −16 LUFS integrated, true peak ≤ −1 dBTP, no clipping; check on phone speakers and headphones.
+
+### 16.9 Pre-render audit (print a table; fix every ✗ before rendering)
+topic: every scene serves the premise ✓/✗ · lines with no job (count must be 0) · tones present (≥ 5 long / ≥ 2 Shorts) · palette differs from previous films · props without purpose (0) · filler shots (walks/holds without event: 0) · scale table consistent · interaction checklist per prop action · camera variety (no 3 similar in a row) · music cue changes at every turn · dialogue intelligibility (music ducked).
