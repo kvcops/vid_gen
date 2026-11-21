@@ -39,9 +39,8 @@ vid_gen/
   tools/node.py  tools/sheet.py                 # Kaggle client · QA contact sheets (shared by all films)
   <film>/                                       # one folder per film, same sub-layout:
     story/ blender/ (or anim2d/) tools/ audio/ assets/ media/ out/ prompts/ README.md
-  devara/                                       # film #1 — reference implementation of the 3D track
 ```
-**New film = new folder** `vid_gen/<film_slug>/`. Never put film-specific files at the root. Reuse code from `devara/` (copy, then adapt).
+**New film = new folder** `vid_gen/<film_slug>/`. Never put film-specific files at the root. Film folders are local only (git-ignored). If an earlier film folder exists locally, reuse its code (copy, then adapt).
 
 ## 3. Golden rules (non-negotiable)
 1. **Picture = Blender (3D or 2.5D) or the pure-Python 2D renderer.** No Remotion / three.js / Node / npm / puppeteer / web renderers. No AI text-to-video for story shots (identity drifts). AI video (Veo etc.) only for optional intro/outro/establishing plates the user supplies.

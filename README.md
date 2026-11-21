@@ -17,4 +17,4 @@ TOKEN    : xxxxxxxx
 
 **3. Approve the short outline** the agent shows → the video lands in `<film>/out/<film>_final.mp4`.
 
-The link changes every Kaggle session — re-run the cell and paste the new lines. Agent rules: `AGENTS.md` · example film: `devara/`
+The link changes every Kaggle session — re-run the cell and paste the new lines. Agent rules: `AGENTS.md`

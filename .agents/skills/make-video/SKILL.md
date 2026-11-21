@@ -34,7 +34,7 @@ Treat the chosen master prompt as if the user had pasted it, with its §0 filled
 | captions | **off** (user preference) unless asked |
 | title mode | `single` (bilingual only if two languages requested) |
 | parody of real IP | original caricatures only + fan-made disclaimer (`AGENTS.md` rule 5) |
-Film slug: lowercase-kebab of the topic (`vid_gen/<slug>/`, copy the layout of `devara/`).
+Film slug: lowercase-kebab of the topic (`vid_gen/<slug>/`, same sub-layout as `AGENTS.md` §2).
 
 ## Step 2 — format rules
 - **Long (16:9):** TEMPLATES §2 story structure, intro title (§13) + outro/end card 10–20 s with YouTube end-screen space, chapters for the description.
