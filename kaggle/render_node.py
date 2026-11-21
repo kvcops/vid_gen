@@ -14,8 +14,9 @@ import os, re, glob, json, time, shutil, secrets, signal, tarfile, threading, su
 # ----------------------------------------------------------------------------------------------- CONFIG (edit freely)
 W        = '/kaggle/working'                 # everything lives here
 PROJ     = f'{W}/proj'                       # your uploaded project
-ENVS     = f'{W}/envs'                       # one isolated python env per model
-MODELS   = f'{W}/models'                     # cloned repos + downloaded weights
+BIG      = '/root/vg'                        # big system disk (TBs): /kaggle/working is only 20 GB
+ENVS     = f'{BIG}/envs'                     # one isolated python env per model (same disk as uv cache -> torch hardlinked, stored once)
+MODELS   = f'{BIG}/models'                   # cloned repos + downloaded weights
 BLENDER_SERIES = '5.3'                       # newest patch of this series is downloaded automatically
 TRACK    = 'both'                            # '3d' · '2d' · 'both'  -> which model set to install
 AUDIO_MODELS = ['whisper', 'chatterbox', 'maya1', 'step_editx', 'moss_sfx', 'ace_step', 'hy_foley', 'zonos3']
@@ -30,7 +31,7 @@ MODEL_SPECS = {
     'whisper':    dict(py='3.11', pip=['faster-whisper'], hf=[]),
     'chatterbox': dict(py='3.11', pip=['chatterbox-tts', 'soundfile'], hf=['ResembleAI/chatterbox-turbo']),
     'maya1':      dict(py='3.11', pip=['transformers', 'accelerate', 'snac', 'soundfile'], hf=['maya-research/maya1']),
-    'step_editx': dict(py='3.10', repo='https://github.com/stepfun-ai/Step-Audio-EditX', hf=['stepfun-ai/Step-Audio-EditX', 'stepfun-ai/Step-Audio-Tokenizer']),
+    'step_editx': dict(py='3.12', repo='https://github.com/stepfun-ai/Step-Audio-EditX', hf=['stepfun-ai/Step-Audio-EditX', 'stepfun-ai/Step-Audio-Tokenizer']),
     'moss_sfx':   dict(py='3.11', repo='https://github.com/OpenMOSS/MOSS-TTS', hf=[]),
     'ace_step':   dict(py='3.11', repo='https://github.com/ace-step/ACE-Step', hf=[]),
     'hy_foley':   dict(py='3.10', repo='https://github.com/Tencent-Hunyuan/HunyuanVideo-Foley', hf=['tencent/HunyuanVideo-Foley']),
@@ -136,12 +137,15 @@ def install_model(name):
                     step(f"grep -viE '^(torch|torchaudio|torchvision)([=<>~ ]|$)' {repo_dir}/{req} > {repo_dir}/_req.txt; "
                          f'uv pip install --python {py} -q -r {repo_dir}/_req.txt')
             if os.path.exists(f'{repo_dir}/setup.py') or os.path.exists(f'{repo_dir}/pyproject.toml'):
-                step(f'uv pip install --python {py} -q --no-deps -e {repo_dir}')
+                has_req = any(os.path.exists(f'{repo_dir}/{r}') for r in ('requirements.txt', 'requirements-inference.txt'))
+                # pyproject-only repos carry their deps there -> install them (CUDA torch index kept available)
+                step(f'uv pip install --python {py} -q {"--no-deps " if has_req else f"--extra-index-url {TORCH_INDEX} "}-e {repo_dir}')
         if spec.get('pip'): step(f'uv pip install --python {py} -q ' + ' '.join(spec['pip']))
-        step(f'uv pip install --python {py} -q "huggingface_hub[cli]" soundfile numpy')
-        for repo_id in spec.get('hf', []):
-            step(f'{env_dir}/bin/huggingface-cli download {repo_id} --local-dir {MODELS}/hf/{repo_id.replace("/", "__")} '
-                 f'{"--token " + HF_TOKEN if HF_TOKEN else ""}')
+        step(f'uv pip install --python {py} -q huggingface_hub soundfile numpy')
+        for repo_id in spec.get('hf', []):   # python API: the old huggingface-cli is gone; token stays out of the log
+            dest = f'{MODELS}/hf/{repo_id.replace("/", "__")}'
+            step(f'{py} -c "import os; from huggingface_hub import snapshot_download as s; '
+                 f's(\'{repo_id}\', local_dir=\'{dest}\', token=os.environ.get(\'HF_TOKEN\') or None)"')
         step(f'CUDA_VISIBLE_DEVICES={MODEL_GPU} {py} -c "import torch; torch.zeros(1).cuda(); print(\'cuda ok\', torch.__version__)"')
         MODEL_STATE[name] = 'ready'
     except Exception as e:

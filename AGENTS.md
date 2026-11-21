@@ -63,7 +63,7 @@ vid_gen/
 1. User runs `kaggle/render_node.py` in one Kaggle cell (Accelerator **GPU T4 x2**, Internet ON) and pastes `ENDPOINT` + `TOKEN` — usually together with the video request — → write them to `.env` as `KAGGLE_URL` / `KAGGLE_TOKEN`, verify with `tools/node.py info`. The link changes every Kaggle session; if `info` fails, ask for fresh lines.
 2. `python tools/node.py info` (GPUs, disk, jobs, model install states) · `push <film_dir> [extra files]` · `run <name> <gpu> "<cmd>"` · `log <name> [tail]` · `kill <name>` · `ls <path>` · `get <remote> <local>`.
 3. GPU policy: **Blender EEVEE always renders on GPU 0** on Kaggle (EGL picks it; don't try to move it). On T4 x2 run AI models on **GPU 1** (`CUDA_VISIBLE_DEVICES=1` works for CUDA). On a single GPU run models before rendering.
-4. Model envs live in `/kaggle/working/envs/<name>` (uv venvs). Run a model with `$ENVS/<name>/bin/python ...`. Check `GET /models` for `ready` / `FAILED`; retry one with `POST /models/install/<name>`.
+4. Model envs live in `/root/vg/envs/<name>` and weights in `/root/vg/models` (big system disk; `/kaggle/working` is only 20 GB — keep it for renders). Run a model with `$ENVS/<name>/bin/python ...`. Check `GET /models` for `ready` / `FAILED`; retry one with `POST /models/install/<name>`.
 5. Download only final mp4/wav (assemble clips on the node). Never pull thousands of frames.
 
 ## 5. Model stack (commercial-OK, fits 16 GB; details in the master prompts)
@@ -93,6 +93,8 @@ vid_gen/
 | BGM/SFX drown dialogue | normalize every SFX/bed first, duck music under speech, loudnorm −15 LUFS |
 | Telugu sounded wrong ("Devar") | never fake a language via another script; use a native TTS |
 | Killed real renders | never kill by PID; use `/kill/<job>` |
+| Kaggle disk full, every model `FAILED` | envs on 20 GB `/kaggle/working` while uv cache is on `/` → torch copied per env. Keep envs + weights on `/root/vg` (same disk as the cache → hardlinked once) |
+| HF download printed help, model `FAILED` | `huggingface-cli` was removed → use `huggingface_hub.snapshot_download` (python API) |
 | Model install conflicts | one uv env per model; `USE_JAX=0 USE_TF=0`; no shared transformers/numpy pins |
 
 ## 7. QA checklist (every shot, before the final render)
