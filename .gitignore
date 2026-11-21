@@ -1,0 +1,21 @@
+# secrets
+.env
+.env.*
+# big / generated media (GitHub 100 MB limit) — films keep code, story, prompts
+*/out/
+*/audio/
+*/media/
+*/frames/
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.blend
+*.blend1
+# python / os junk
+__pycache__/
+*.pyc
+.venv/
+venv/
+Thumbs.db
+desktop.ini
