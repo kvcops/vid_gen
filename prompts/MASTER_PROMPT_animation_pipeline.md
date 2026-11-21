@@ -66,7 +66,7 @@ blender/ run_shot.py  cams.py  shots/*.py
 blender/lib/ core.py rig.py chars.py assets.py retarget.py acting.py sets.py envs.py fx.py shot.py
 assets/ media/ audio/ out/
 ```
-Reuse code from an earlier local film folder if present (e.g. `vid_gen/<old_film>/blender/lib/*.py` (characters, rig/IK, acting, sets), `vid_gen/<old_film>/tools/final_mix.py` (layered mix + ducking), `vid_gen/<old_film>/tools/fit_dialogue.py`. Put each new film in its own folder `vid_gen/<film>/` (same sub-layout as `devara/`); keep shared things (`kaggle/`, `tools/node.py`, `prompts/MASTER_PROMPT…`) at the root.
+Reuse code from an earlier local film folder if present (e.g. `vid_gen/<old_film>/blender/lib/*.py` (characters, rig/IK, acting, sets), `vid_gen/<old_film>/tools/final_mix.py` (layered mix + ducking), `vid_gen/<old_film>/tools/fit_dialogue.py`. Put each new film in its own folder `vid_gen/<film>/` (sub-layout in `AGENTS.md` §2); keep shared things (`kaggle/`, `tools/node.py`, `prompts/MASTER_PROMPT…`) at the root.
 
 ## 5. PREDEFINED CREATIVE TEMPLATES (fill these, don't invent formats)
 ### 5.1 Story bible (`story/bible.yaml`)
